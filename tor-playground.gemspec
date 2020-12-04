@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "sparql", "~> 3.1"
   spec.add_dependency "rdf-rdfa", "~> 3.1"
+  spec.add_dependency "rdf-turtle", "~> 3.1"
 end
