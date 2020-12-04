@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "sparql", "~> 3.1"
+  spec.add_dependency "rdf-rdfa", "~> 3.1"
 end
