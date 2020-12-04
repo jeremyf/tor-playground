@@ -11,13 +11,29 @@ namespace :experiments do
     require 'rdf/turtle'
     require 'sparql'
 
-    filename = "https://raw.githubusercontent.com/takeonrules/takeonrules.github.io/7d25cba04e04a479da2c2af845b52c36d497c56a/index.html"
-    graph = RDF::Graph.load(filename, format: :rdfa, content_type: "text/html")
+    # ROOT = "https://raw.githubusercontent.com/takeonrules/takeonrules.github.io/7d25cba04e04a479da2c2af845b52c36d497c56a"
+    ROOT = "http://localhost:1313/"
+    graph = RDF::Graph.new
     repository = RDF::Repository.new
-    repository.insert(graph.statements)
-    all_solutions = SPARQL.execute("SELECT * WHERE { ?s ?p ?o }", repository)
-    raise "Expected at least one solution to query" if all_solutions.count < 1
+
+    [
+      "/2020/11/30/session-7-new-vistas-in-the-thel-sector/index.html",
+      "/site-map/session-reports/index.html",
+      "/index.html"
+    ].each do |path|
+      uri = File.join(ROOT, path)
+      RDF::Reader.open(uri) do |reader|
+        reader.each_statement do |statement|
+          if statement.object.literal?
+            statement.object.squish!
+          end
+          repository.insert(statement)
+        end
+      end
+    end
     solutions = SPARQL.execute("PREFIX sc: <http://schema.org/>\nSELECT * WHERE { ?s sc:headline ?o }", repository)
-    raise "Expected 10 solutions for headlines; that's the pagination size of the source" unless solutions.count == 10
+    require 'byebug'; debugger; true
+    :debugger
+
   end
 end
