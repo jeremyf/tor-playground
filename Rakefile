@@ -16,19 +16,33 @@ namespace :experiments do
     graph = RDF::Graph.new
     repository = RDF::Repository.new
 
-    [
+    _paths = [
       "/2020/11/30/session-7-new-vistas-in-the-thel-sector/index.html",
       "/site-map/session-reports/index.html",
       "/index.html"
-    ].each do |path|
+    ]
+
+    GIT_REPO = "/Users/jfriesen/git/takeonrules.github.io/public"
+    paths = Dir.glob(File.join(GIT_REPO, "/**/*.html")).map do |filename|
+      filename.sub(GIT_REPO, "")
+    end
+
+    paths.each do |path|
+      next if path.include?("/amp/")
+      next if path.include?("/tag/")
+      next if path.include?("/tables/")
       uri = File.join(ROOT, path)
-      RDF::Reader.open(uri) do |reader|
-        reader.each_statement do |statement|
-          if statement.object.literal?
-            statement.object.squish!
+      begin
+        RDF::Reader.open(uri) do |reader|
+          reader.each_statement do |statement|
+            if statement.object.literal?
+              statement.object.squish!
+            end
+            repository.insert(statement)
           end
-          repository.insert(statement)
         end
+      rescue IOError, REXML::ParseException => e
+        $stderr.puts "Error in #{path}"
       end
     end
     solutions = SPARQL.execute("PREFIX sc: <http://schema.org/>\nSELECT * WHERE { ?s sc:headline ?o }", repository)
