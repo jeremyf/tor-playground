@@ -16,7 +16,9 @@ namespace :experiments do
     graph = RDF::Graph.new
     repository = RDF::Repository.new
 
-    _paths = [
+    paths = [
+      "/2017/09/13/celebrating-17-years-of-the-open-gaming-license/index.html",
+      "/2017/02/27/campaign-rulings-descriptions-and-questing/index.html",
       "/2020/11/30/session-7-new-vistas-in-the-thel-sector/index.html",
       "/site-map/session-reports/index.html",
       "/index.html"
@@ -31,6 +33,8 @@ namespace :experiments do
       next if path.include?("/amp/")
       next if path.include?("/tag/")
       next if path.include?("/tables/")
+      next if path.include?("/categories/")
+      next if path.include?("/category/")
       uri = File.join(ROOT, path)
       begin
         RDF::Reader.open(uri) do |reader|
